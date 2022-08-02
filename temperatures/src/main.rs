@@ -3,13 +3,21 @@ use core::panic;
 use getopts::Options;
 use std::env;
 
-fn do_work(inp: &str, out: Option<String>) {
-    println!("{}", inp);
+fn convert(input: &str, out: Option<String>) -> f32 {
+    let degrees: f32 = input.parse().expect("degrees are invalid");
     match out.unwrap().as_str() {
-        "fahrenheit" => println!("華氏"),
-        "celsius" => println!("摂氏"),
-        _ => panic!("デフォルト値は華氏"),
+        "fahrenheit" => fahrenheit2celsius(degrees),
+        "celsius" => celsius2fahrenheit(degrees),
+        _ => panic!("invalid type"),
     }
+}
+
+fn fahrenheit2celsius(input: f32) -> f32 {
+    return (input - 32.0) * 5.0 / 9.0;
+}
+
+fn celsius2fahrenheit(input: f32) -> f32 {
+    return input * 9.0 / 5.0 + 32.0
 }
 
 fn print_usage(program: &str, opts: Options) {
@@ -23,6 +31,7 @@ fn main() {
     let mut opts = Options::new();
     opts.optopt("t", "type", "set degrees type of input value. 'fahrenheit' or 'celsius'", "TYPE");
     opts.optflag("h", "help", "print this help menu");
+    opts.optflag("m", "minus", "make input value minus");
 
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,
@@ -36,6 +45,8 @@ fn main() {
         return;
     }
 
+    let minus = matches.opt_present("m");
+
     let t = matches.opt_str("t");
     let input = if !matches.free.is_empty() {
         matches.free[0].clone()
@@ -43,6 +54,9 @@ fn main() {
         print_usage(&program, opts);
         return;
     };
+    let input = if minus { format!("-{}", input) } else { input };
 
-    do_work(&input, t);
+    let degrees = convert(&input, t);
+
+    println!("{}", degrees);
 }
