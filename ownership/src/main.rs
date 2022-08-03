@@ -6,8 +6,7 @@ fn main() {
     s.push_str(", world!");
     println!("{}", s);
 
-    let x = String::from("one");
-    let y = x;
-    y.to_owned().push_str("two");
-    println!("y = {}", y);
+    let s1 = String::from("hello");
+    let s2 = s1.clone();
+    println!("s1 = {}, s2 = {}", s1, s2);
 }
