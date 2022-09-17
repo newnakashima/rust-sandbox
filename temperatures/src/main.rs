@@ -3,9 +3,9 @@ use core::panic;
 use getopts::Options;
 use std::env;
 
-fn convert(input: &str, out: Option<String>) -> f32 {
+fn convert(input: &str, out: String) -> f32 {
     let degrees: f32 = input.parse().expect("degrees are invalid");
-    match out.unwrap().as_str() {
+    match out.as_str() {
         "fahrenheit" => fahrenheit2celsius(degrees),
         "celsius" => celsius2fahrenheit(degrees),
         _ => panic!("invalid type"),
@@ -48,6 +48,10 @@ fn main() {
     let minus = matches.opt_present("m");
 
     let t = matches.opt_str("t");
+    let t = match t {
+        Some(s) => s,
+        None => String::from("fahrenheit"),
+    };
     let input = if !matches.free.is_empty() {
         matches.free[0].clone()
     } else {
