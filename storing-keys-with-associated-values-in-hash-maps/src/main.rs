@@ -1,4 +1,4 @@
-use std::{collections::HashMap, io, process::exit};
+use std::{collections::HashMap, io, process::exit, hash::Hash};
 
 // use storing_keys_with_associated_values_in_hash_maps::{median::median, text_interface::service};
 use storing_keys_with_associated_values_in_hash_maps::text_interface::*;
@@ -56,7 +56,28 @@ fn main() {
     //     let count = map.entry(word).or_insert(0);
     //     *count += 1;
     // }
-    func();
+    // func();
+
+    // let list = vec!["one", "two", "three", "four", "one"];
+    let mut map: HashMap<String, Vec<String>> = HashMap::new();
+
+    // for item in list {
+    loop {
+        let mut item = String::new();
+        let stdin = io::stdin();
+        let _ = stdin.read_line(&mut item);
+
+        let v = map.get_mut(&item);
+        if let Some(vector) = v {
+            vector.push("hoge".to_string());
+        } else {
+            map.insert(item.to_string(), vec!["hoge".to_string()]);
+        }
+
+        println!("{:?}", map);
+    }
+
+
 }
 fn func() {
     // println!("{:?}", map);
