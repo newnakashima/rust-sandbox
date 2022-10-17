@@ -3,6 +3,11 @@ use std::{collections::HashMap, io, process::exit, hash::Hash};
 // use storing_keys_with_associated_values_in_hash_maps::{median::median, text_interface::service};
 use storing_keys_with_associated_values_in_hash_maps::text_interface::*;
 
+struct Employee {
+    name: String,
+    department: String,
+}
+
 fn main() {
     // let mut scores = HashMap::new();
 
@@ -67,18 +72,97 @@ fn main() {
         let stdin = io::stdin();
         let _ = stdin.read_line(&mut item);
 
-        let v = map.get_mut(&item);
-        if let Some(vector) = v {
-            vector.push("hoge".to_string());
-        } else {
-            map.insert(item.to_string(), vec!["hoge".to_string()]);
+        let mut words: Vec<&str> = vec![];
+        for word in item.split_whitespace() {
+            words.push(word);
         }
 
-        println!("{:?}", map);
+        let first = match words.get(0) {
+            Some(&word) => word,
+            None => { println!("first argument is invalid"); continue; }
+        };
+
+        let second = match words.get(1) {
+            Some(&word) => word,
+            None => { println!("second argument is invalid"); continue; }
+        };
+
+        let fifth = words.get(4);
+        if let None = fifth {
+            return;
+        }
+
+        println!("{}", fifth.unwrap());
+
+        let result: String = match first {
+            "Add" => {
+                let fourth = match words.get(3) {
+                    Some(&word) => word,
+                    None => { println!("fourth argument is invalid"); continue; },
+                };
+
+                let v = map.get_mut(fourth);
+                if let Some(vector) = v {
+                    vector.push(second.to_string());
+                } else {
+                    map.insert(fourth.to_string(), vec![second.to_string()]);
+                }
+
+                format!("{} is added to department {}", second, fourth)
+            },
+            "List" => {
+                match second {
+                    "Company" => {
+                        let mut employees: Vec<Employee> = vec![];
+                        let mut employees_string = String::from("");
+
+                        for (department, _) in map.clone() {
+                            if let Some(list) = map.get_mut(&department) {
+                                for e in list {
+                                    employees.push(Employee { name: e.to_string(), department: department.to_string() })
+                                }
+                            }
+                        }
+                        employees.sort_by(|a,b| { a.name.cmp(&b.name) });
+                        for employee in employees {
+                            employees_string += &format!("{} in department {}\n", employee.name, employee.department);
+                        }
+
+                        employees_string
+                    },
+                    "Department" => {
+                        let third = match words.get(2) {
+                            Some(&word) => word,
+                            None => { println!("third argument is invalid"); continue; },
+                        };
+
+                        let mut employees_string = String::from("");
+                        if let Some(list) = map.get_mut(third) {
+                            list.sort();
+                            list.iter().for_each(|i| {
+                                employees_string += &format!("{} in department {}\n", i, third);
+                            })
+                        }
+
+                        employees_string
+                    }
+                    _ => { println!("second argument is invalid"); continue; },
+                }
+            }
+            _ => { println!("first argument is invalid"); continue; },
+        };
+
+        println!("{}", result);
+
+        // let v = map.get_mut(&item);
+        // if let Some(vector) = v {
+        //     vector.push("hoge".to_string());
+        // } else {
+        //     map.insert(item.to_string(), vec!["hoge".to_string()]);
+        // }
     }
-
-
 }
+
 fn func() {
     // println!("{:?}", map);
     let mut map: HashMap<String, &mut Vec<String>>  = HashMap::new();
