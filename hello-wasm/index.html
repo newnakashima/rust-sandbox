@@ -8,9 +8,10 @@
 </head>
 <body>
     <script type="module">
-        import init, { greet } from './pkg/hello_wasm.js'
-        init().then(() => {
+        import init, { greet, my_log } from './pkg/hello_wasm.js'
+        init().then(r => {
             greet("WebAssembly")
+            my_log("Hello")
         })
     </script>
 </body>
