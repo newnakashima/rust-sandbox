@@ -12,9 +12,8 @@ impl Post {
     }
 
     pub fn add_text(&mut self, text: &str) {
-        if let Some(s) = self.state.take() {
-            self.state = Some(s.add_text(self, text));
-        }
+        let text = self.state.as_ref().unwrap().add_text(text);
+        self.content.push_str(text);
     }
 
     pub fn content(&self) -> &str {
@@ -41,14 +40,15 @@ impl Post {
 }
 
 trait State: std::fmt::Debug {
-// trait State {
     fn request_review(self: Box<Self>) -> Box<dyn State>;
     fn approve(self: Box<Self>) -> Box<dyn State>;
-    fn content<'a>(&self, post: &'a Post) -> &'a str {
+    fn content<'a>(&self, _post: &'a Post) -> &'a str {
         ""
     }
     fn reject(self: Box<Self>) -> Box<dyn State>;
-    fn add_text(self: Box<Self>, post: &mut Post, text: &str) -> Box<dyn State>;
+    fn add_text<'a>(&self, _text: &'a str) -> &'a str {
+        ""
+    }
 }
 
 #[derive(Debug)]
@@ -66,9 +66,8 @@ impl State for Draft {
     fn reject(self: Box<Self>) -> Box<dyn State> {
         self
     }
-    fn add_text(self: Box<Self>, post: &mut Post, text: &str) -> Box<dyn State> {
-        post.content.push_str(text);
-        self
+    fn add_text<'a>(&self, text: &'a str) -> &'a str {
+        text
     }
 }
 
@@ -93,9 +92,6 @@ impl State for PendingReview {
     fn reject(self: Box<Self>) -> Box<dyn State> {
         Box::new(Draft {})
     }
-    fn add_text(self: Box<Self>, post: &mut Post, text: &str) -> Box<dyn State> {
-        self
-    }
 }
 
 #[derive(Debug)]
@@ -112,9 +108,6 @@ impl State for Published {
         &post.content
     }
     fn reject(self: Box<Self>) -> Box<dyn State> {
-        self
-    }
-    fn add_text(self: Box<Self>, post: &mut Post, text: &str) -> Box<dyn State> {
         self
     }
 }
